@@ -24,13 +24,13 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { identifier , password } = req.body;
         console.log(req.body);
         
-        if (!(email && password)) {
+        if (!(identifier && password)) {
             return res.status(400).json({ message: "Email and password are required" });
         }
-        const user = await User.findOne({ $or: [{ email }] });
+        const user = await User.findOne({ $or: [{ email: identifier },{username:identifier }] });
         if (!user) {
             return res.status(401).json({ message: "Invalid email or password" });
         }
