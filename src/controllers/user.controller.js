@@ -1,4 +1,5 @@
 import {User} from '../models/user.model.js';
+import { uploadOnCloudinary } from '../utils/cloudinary.js';
 
 const getUserProfile = async (req, res) => {
     try {
@@ -74,9 +75,27 @@ const deleteUserAccount = async (req, res) => {
 
 const updateAvatar = async (req, res) =>{
     try {
-        
+        const userId = req.user._id;
+        const localImagePath = req.file?.path
+        console.log("file path :",localImagePath)
+        const avatarUrl = await uploadOnCloudinary(localImagePath);
+        console.log("avatar url :",avatarUrl)
+        if(!avatarUrl){
+            return res.status(500).json({message:"Error in uploading avatar"})
+        }
+        const user = await User.findByIdAndUpdate(
+            userId,
+            {avatar: avatarUrl},
+            {new:true}
+        ).select('-password -refreshTokens');
+        if(!user){
+            return res.status(404).json({message:"User not found"})
+        }
+        res.status(200).json({user,message:"Avatar updated successfully"});
+
     } catch (error) {
-        
+        console.error("Error in updateAvatar:", error);
+        res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
