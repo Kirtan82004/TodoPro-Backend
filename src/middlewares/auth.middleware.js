@@ -2,8 +2,18 @@ import jwt from 'jsonwebtoken';
 import {User} from '../models/user.model.js';
 
 const verfifyJWT = async (req, res, next) => {
-    const token = req.cookies?.accessToken || req.header('authorization')?.replace('Bearer ', '');
-    console.log("Token from cookie:", req.cookies?.accessToken);
+
+    //console.log("Headers:", req.headers);
+
+    const authHeader = req.get("Authorization");
+
+    const token =
+        req.cookies?.accessToken ||
+        (authHeader && authHeader.startsWith("Bearer ")
+            ? authHeader.split(" ")[1]
+            : null);
+    
+    console.log("Extracted Token:", token);
     if (!token) {
         return res.status(401).json({ message: 'Access Denied. No token provided.' });
     }
