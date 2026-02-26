@@ -2,7 +2,8 @@ import jwt from 'jsonwebtoken';
 import {User} from '../models/user.model.js';
 
 const verfifyJWT = async (req, res, next) => {
-    const token = req.cookies?.accessToken || req.headr('authorization')?.replace('Bearer ', '');
+    const token = req.cookies?.accessToken || req.header('authorization')?.replace('Bearer ', '');
+    console.log("Token from cookie:", req.cookies?.accessToken);
     if (!token) {
         return res.status(401).json({ message: 'Access Denied. No token provided.' });
     }
